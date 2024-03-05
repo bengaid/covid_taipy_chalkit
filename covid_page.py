@@ -1,7 +1,7 @@
 from taipy.gui.custom import Page
-from resource_handler import PureHTMLResourceHandler
-
+from chlkt.taipy import * 
 import pandas as pd
+import copy
 
 # Define URLs and dataset names
 BASE_URL = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series"
@@ -23,7 +23,6 @@ def get_covid_filtered(covid_data_frame, selected_country):
     return sel.to_dict('split')
 
 def echarts_option(covid_df, selected_countries):
-# Assuming dataNodes is already defined somewhere in your Python code
 
     series = []
     yAxisName = ''
@@ -112,9 +111,8 @@ def echarts_option(covid_df, selected_countries):
 
 def on_change(state, var, val):
     if (var == 'selected_countries'):
-        state.selected_countries = val
-        state.covid_filtered = get_covid_filtered(covid_data_frame, val)
-        state.option_e = echarts_option(state.covid_filtered, val)
+        covid_filtered = copy.deepcopy(get_covid_filtered(covid_data_frame, val))
+        state.option_e = copy.deepcopy(echarts_option(covid_filtered, val))
 
 # Main code
 dataset_name = DATASET_NAMES[0]
@@ -122,8 +120,8 @@ covid_data_frame = fetch_and_prepare_covid_data(dataset_name)
 countries_list = get_countries_list(covid_data_frame)
 selected_countries = ["France"]  # List of countries to process
 
-covid_filtered = get_covid_filtered(covid_data_frame, selected_countries)
-option_e = echarts_option(covid_filtered, selected_countries)
+covid_filtered = copy.deepcopy(get_covid_filtered(covid_data_frame, selected_countries))
+option_e = copy.deepcopy(echarts_option(covid_filtered, selected_countries))
 
 # Create a Page instance with the resource handler
 page = Page(PureHTMLResourceHandler())
